@@ -14,52 +14,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/persons")
-public class PersonController {
+public class PersonController implements Storage{
 
     @Autowired
     PersonRepository personRepository;
 
-    @RequestMapping(value = "/create", method = POST)
-    public ResponseEntity<?> createPerson(@RequestBody Person person){
-       // person.setId("600");
-        getStringObjectMap(person, "Person created successfully");
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/persons/" + person.getId());
-        return new ResponseEntity(person, headers, HttpStatus.CREATED);
-        // return ResponseEntity.created(new URI("/api/persons/" + person.getId())).build();
+    public PersonController() {
     }
 
-    /*@RequestMapping(value = "/create", method = POST)
-    public Map<String, Object> create(Person person) {
-
-        return getStringObjectMap(person, "Person created successfully");
-    }*/
-
-    @RequestMapping("/create")
-    public Map<String, Object> create(Person person) {
+    @RequestMapping(value = "/persons", method = POST)
+    public Map<String, Object> create(@RequestBody Person person){
 
         return getStringObjectMap(person, "Person created successfully");
     }
 
-    @RequestMapping("/read")
-    public Map<String, Object> read(@RequestParam String id) {
+    @RequestMapping(value = "/persons/id", method = GET)
+    public Map<String, Object> readOne(@RequestParam String id) {
 
         Person person = personRepository.findOne(id);
         return getStringObjectMap(person, "Person found successfully");
     }
 
-    @RequestMapping("/update")
+    @RequestMapping(value = "/persons", method = PUT)
     public Map<String, Object> update(@RequestParam String id, @RequestParam String firstName) {
         Person person = personRepository.findOne(id);
         person.setFirstName(firstName);
         return getStringObjectMap(person, "Person updated successfully");
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping(value = "/persons", method = DELETE)
     public Map<String, Object> delete(@RequestParam String id) {
 
         personRepository.delete(id);
@@ -69,11 +55,11 @@ public class PersonController {
         return dataMap;
     }
 
-    @RequestMapping("/read-all")
+    @RequestMapping(value = "/persons", method = GET)
     public Map<String, Object> readAll() {
         List<Person> persons = personRepository.findAll();
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("message", "Person found successfully");
+        dataMap.put("message", "Persons found successfully");
         dataMap.put("nr of persons", persons.size());
         dataMap.put("status", "1");
         dataMap.put("persons", persons);
